@@ -9,6 +9,7 @@ function App() {
   const baseUrl = "https://localhost:7195/Alunos";
 
   const [data, setData] = useState([]);
+  const [updateData, setUpdateData] = useState(true);
   const [modalIncluir, setModalIncluir] = useState(false);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalExcluir, setModalExcluir] = useState(false);
@@ -60,6 +61,7 @@ function App() {
       await axios.post(baseUrl, alunoSelecionado)
     .then(response=>{
       setData(data.concat(response.data));
+      setUpdateData(true);
       abrirFecharModalIncluir();
     }).catch(error =>{
       console.log(error);
@@ -80,6 +82,7 @@ function App() {
           aluno.idade = resposta.idade;
         }
       });
+      setUpdateData(true);
       abrirFecharModalEditar();
     }).catch(error => {
       console.log(error);
@@ -90,16 +93,20 @@ function App() {
     await axios.delete(baseUrl + "/" + alunoSelecionado.id)
     .then(response => {
       setData(data.filter(aluno => aluno.id !== response.data));
-        abrirFecharModalExcluir();
+      setUpdateData(true);
+      abrirFecharModalExcluir();
     }).catch(error => {
       console.log(error);
     })
   }
 
   useEffect(() => {
-    pedidoGet();
-  })
-
+    if(updateData) {
+      pedidoGet();
+      setUpdateData(false);
+    }
+  }, [updateData])
+  
   return (
     <div className="aluno-container">
       <br/>
